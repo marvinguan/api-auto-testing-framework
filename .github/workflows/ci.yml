@@ -24,13 +24,16 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: 启动 Restful-Booker 靶场 (Docker)
-      run: docker run -d -p 3001:3001 mwinteringham/restful-booker
+    # 👇 替换了原来的 Docker 步骤，直接用源码启动，避开镜像被删的坑
+    - name: 克隆并启动 Restful-Booker 靶场
+      run: |
+        git clone https://github.com/mwinteringham/restful-booker.git
+        cd restful-booker
+        npm install
+        npm start &
+        sleep 15
 
-    - name: 等待环境就绪
-      run: sleep 5
-
-    - name: 执行自动化测试 (生成 Allure 报告)
+    - name: 执行自动化测试
       env:
         BASE_URL: http://localhost:3001
       run: pytest
